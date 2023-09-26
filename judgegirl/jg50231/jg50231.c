@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define DEBUG
-
 #define f(k) (77 * k + 2222) % s
 #define maxn 105
 #define maxs maxn * maxn
@@ -70,7 +68,7 @@ int main() {
 		}
 	}
 
-	bool haspair = 1, first = 1, f1 = 1, f2 = 1;
+	bool haspair = 1, first = 1;
 	struct hash tmp0;
 	while(haspair) {
 		/* eliminate the same numbers a.k.a. tmp1 and tmp2 */ 
@@ -79,23 +77,19 @@ int main() {
 #endif
 
 #ifndef DEBUG
-		printf("%c%d", (first? '' : ' '), tmp1.index);
+		printf("%c%d", (first? '\0' : ' '), tmp1.index);
 #endif
 		first = 0;
 		height[tmp1.x][tmp1.y]--;
 		height[tmp2.x][tmp2.y]--;
-		if(height[tmp1.x][tmp1.y] == 0)
-			f1 = 0;
-		else
+		if(height[tmp1.x][tmp1.y] > 0)
 			tmp1.index = tower[n - height[tmp1.x][tmp1.y]][tmp1.x][tmp1.y];
-		if(height[tmp2.x][tmp2.y] == 0)
-			f2 = 0;
-		else 
+		if(height[tmp2.x][tmp2.y] > 0)
 			tmp2.index = tower[n - height[tmp2.x][tmp2.y]][tmp2.x][tmp2.y];
-		if(f1 && f2 && tmp1.index == tmp2.index)
+		if(height[tmp1.x][tmp1.y] && height[tmp2.x][tmp2.y] && tmp1.index == tmp2.index)
 			continue;
 
-		if(f1) {
+		if(height[tmp1.x][tmp1.y] > 0) {
 #ifdef DEBUG
 			printf("into function f1, tmp1 is %d\n", tmp1.index);
 #endif
@@ -106,7 +100,7 @@ int main() {
 #ifdef DEBUG
 				printf("tmp1 has the pair and tmp2 won't have\n");
 #endif
-				if(f2) {
+				if(height[tmp2.x][tmp2.y] > 0) {
 #ifdef DEBUG
 					printf("push tmp2 into the hash table\n");
 #endif
@@ -132,19 +126,30 @@ int main() {
 				hashtable[key1][k1] = tmp1;
 			}
 		}		
-		else if(f2) {
+		else if(height[tmp2.x][tmp2.y] > 0) {
+#ifdef DEBUG
+			printf("into function f2, tmp2 is %d\n", tmp2.index);
+#endif
 			int key2 = f(tmp2.index), k2 = 0;
 			while(k2 < c && hashtable[key2][k2].index != tmp2.index) 
 				k2++;
 			if(k2 < c) {
-				if(f1) {
-					/* push tmp1 into the hash table */
+#ifdef DEBUG
+				printf("tmp2 has the pair and tmp1 won't have\n");
+#endif
+				if(height[tmp1.x][tmp1.y] > 0) {
 					int k1 = 0, key1 = f(tmp1.index);
 					while(k1 < c && hashtable[key1][k1].index > 0)
 						k1++;
 					hashtable[key1][k1] = tmp1;
+#ifdef DEBUG
+					printf("pushed %d into the hash table.\n", tmp1.index);
+#endif
 				}
 				tmp1 = hashtable[key2][k2];
+#ifdef DEBUG
+				printf("%d\n", tmp1.index);
+#endif
 			}
 			else {
 				k2 = 0;
@@ -157,4 +162,5 @@ int main() {
 		else
 			haspair = 0;
 	}
+	printf("\n");
 }
