@@ -22,10 +22,84 @@ void gettower(int tower[maxn][maxn][maxn], int n) {
 	for(int i = 1; i <= n; ++i) {
 		for(int j = 0; j < i; ++j) {
 			for(int k = 0; k < i; ++k) {
-				scanf("%d", &tower[i-1][j][k]);
+				scanf("%d", &tower[n - i][j][k]);
 			}
 		}
 	}
+}
+
+void getheight(int height[maxn][maxn], int n) {
+	for(int i = 0; i < n; ++i) {
+		for(int j = 0; j < n; ++j) {
+			height[i][j] = n - max(i, j);
+		}
+	}
+}
+
+void initializehash(int tower[maxn][maxn][maxn],int height[maxn][maxn], int n, int s, int c, struct hash hashtable[maxs][maxc], struct hash tmp[2]) {
+	for(int i = 0; i < n; ++i) {
+		for(int j = 0; j < n; ++j) {
+			int index = tower[height[i][j] - 1][i][j];
+			int key = f(index), k = 0;
+			while(k < c && hashtable[key][k].index != index)
+				k++;
+			if(k < c) {
+				/* this index has appeared twice. */
+				tmp[0] = hashtable[key][k];
+				tmp[1].index = index, tmp[1].x = i, tmp[1].y = j;
+				hashtable[key][k].index = 0;
+#ifdef DEBUG
+				printf("%d %d\n", tmp[0].index, tmp[1].index);
+#endif
+				continue;
+			}
+			k = 0;
+			while(k < c && hashtable[key][k].index > 0)
+				k++;
+			/* insert the index into the hash table */
+			hashtable[key][k].index = index;
+			hashtable[key][k].x = i;
+			hashtable[key][k].y = j;
+		}
+	}
+}
+
+void poptower(int height[maxn][maxn], int tower[maxn][maxn][maxn], struct hash tmp[2]) {
+	printf("%d ", tmp[0].index);
+	height[tmp[0].x][tmp[0].y]--;
+	height[tmp[1].x][tmp[1].y]--;
+	if(height[tmp[0].x][tmp[0].y] > 0)
+		tmp[0].index = tower[height[tmp[0].x][tmp[0].y] - 1][tmp[0].x][tmp[0].y];
+	else
+		tmp[0].index = 0;
+	if(height[tmp[1].x][tmp[1].y] > 0)
+		tmp[1].index = tower[height[tmp[1].x][tmp[1].y] - 1][tmp[1].x][tmp[1].y];
+	else
+		tmp[1].index = 0;
+}
+
+int findpair(struct hash hashtable[maxs][maxc], int index, int s, int c) {
+	if(index == 0)
+		return -1;
+	int k = 0, key = f(index);
+	while(k < c && hashtable[key][k].index != index)
+		k++;
+	if(k == c)
+		return -1;
+	else
+		return k;
+}
+
+void inserthashtable(struct hash hashtable[maxs][maxc], struct hash inpt, int s, int c) {
+	assert(findpair(hashtable, inpt.index, s, c) == -1);
+	if(inpt.index == 0)
+		return;
+	int k = 0, key = f(inpt.index);
+	while(hashtable[key][k].index > 0)
+		k++;
+	assert(k < c && hashtable[key][k].index == 0);
+	hashtable[key][k] = inpt;
+	return;
 }
 
 int main() {
@@ -33,134 +107,66 @@ int main() {
 	scanf("%d%d%d", &n, &s, &c);
 	
 	assert(n <= maxn);
+	assert(s <= n * n);
+	assert(c <= maxc);
 
 	int tower[maxn][maxn][maxn];
 	gettower(tower, n);
 
 	int height[maxn][maxn];
-	for(int i = 0; i < n; ++i) {
-		for(int j = 0; j < n; ++j) {
-			height[i][j] = n - max(i, j);
-		}
-	}
+	getheight(height, n);
+	
 
-	struct hash hashtable[maxs][maxc], tmp1, tmp2;
-	for(int i = 0; i < n; ++i) {
-		for(int j = 0; j < n; ++j) {
-			int ind = tower[n - height[i][j]][i][j];
-			int key = f(ind), k = 0;
-			while(k < c && hashtable[key][k].index != ind)
-				k++;
-			if(k < c) {
-				/* this index has appeared twice. */
-				tmp1 = hashtable[key][k];
-				tmp2.index = ind, tmp2.x = i, tmp2.y = j;
-				hashtable[key][k].index = 0;
-				continue;
-			}
-			k = 0;
-			while(k < c && hashtable[key][k].index > 0)
-				k++;
-			/* insert the index into the hash table */
-			hashtable[key][k].index = ind;
-			hashtable[key][k].x = i;
-			hashtable[key][k].y = j;
-		}
-	}
+	struct hash hashtable[maxs][maxc], tmp[2];
+	/* initialize hashtable */
+	initializehash(tower, height, n, s, c, hashtable, tmp);
 
 	bool haspair = 1, first = 1;
-	struct hash tmp0;
 	while(haspair) {
+		//find tmp[0] has pair?;
+		//
+		//true then assert tmp[1] no pair;
+		//
+		//insert tmp[1] to hashtable and move tmp[1] to the pair;
+		//
+		//else
+		//
+		//find tmp[1] has pair?;
+		//
+		//true then assert tmp[0] no pair;
+		//
+		//insert tmp[0] to hashtable and move tmp[0] to the pair;
+
 		/* eliminate the same numbers a.k.a. tmp1 and tmp2 */ 
-#ifdef DEBUG
-		printf("index: %d x1: %d y1: %d x2: %d y2: %d\n", tmp1.index, tmp1.x, tmp1.y, tmp2.x, tmp2.y);
-#endif
+		haspair = 0;
 
-#ifndef DEBUG
-		printf("%c%d", (first? '\0' : ' '), tmp1.index);
-#endif
-		first = 0;
-		height[tmp1.x][tmp1.y]--;
-		height[tmp2.x][tmp2.y]--;
-		if(height[tmp1.x][tmp1.y] > 0)
-			tmp1.index = tower[n - height[tmp1.x][tmp1.y]][tmp1.x][tmp1.y];
-		if(height[tmp2.x][tmp2.y] > 0)
-			tmp2.index = tower[n - height[tmp2.x][tmp2.y]][tmp2.x][tmp2.y];
-		if(height[tmp1.x][tmp1.y] && height[tmp2.x][tmp2.y] && tmp1.index == tmp2.index)
+		poptower(height, tower, tmp);
+		
+		if(tmp[0].index > 0 && tmp[0].index == tmp[1].index) {
+			haspair = 1;
 			continue;
-
-		if(height[tmp1.x][tmp1.y] > 0) {
-#ifdef DEBUG
-			printf("into function f1, tmp1 is %d\n", tmp1.index);
-#endif
-			int key1 = f(tmp1.index), k1 = 0;
-			while(k1 < c && hashtable[key1][k1].index != tmp1.index) 
-				k1++;
-			if(k1 < c) {
-#ifdef DEBUG
-				printf("tmp1 has the pair and tmp2 won't have\n");
-#endif
-				if(height[tmp2.x][tmp2.y] > 0) {
-#ifdef DEBUG
-					printf("push tmp2 into the hash table\n");
-#endif
-					/* push tmp2 into the hash table */
-					int k2 = 0, key2 = f(tmp2.index);
-					while(k2 < c && hashtable[key2][k2].index > 0)
-						k2++;
-					hashtable[key2][k2] = tmp2;
-#ifdef DEBUG
-					printf("pushed %d into the hash table.\n", tmp2.index);
-#endif
-				}
-				tmp2 = hashtable[key1][k1];
-#ifdef DEBUG
-				printf("%d\n", tmp2.index);
-#endif
-			}
-			else {
-				k1 = 0;
-				while(k1 < c && hashtable[key1][k1].index > 0)
-					k1++;
-				/* insert the index into the hash table */
-				hashtable[key1][k1] = tmp1;
-			}
-		}		
-		else if(height[tmp2.x][tmp2.y] > 0) {
-#ifdef DEBUG
-			printf("into function f2, tmp2 is %d\n", tmp2.index);
-#endif
-			int key2 = f(tmp2.index), k2 = 0;
-			while(k2 < c && hashtable[key2][k2].index != tmp2.index) 
-				k2++;
-			if(k2 < c) {
-#ifdef DEBUG
-				printf("tmp2 has the pair and tmp1 won't have\n");
-#endif
-				if(height[tmp1.x][tmp1.y] > 0) {
-					int k1 = 0, key1 = f(tmp1.index);
-					while(k1 < c && hashtable[key1][k1].index > 0)
-						k1++;
-					hashtable[key1][k1] = tmp1;
-#ifdef DEBUG
-					printf("pushed %d into the hash table.\n", tmp1.index);
-#endif
-				}
-				tmp1 = hashtable[key2][k2];
-#ifdef DEBUG
-				printf("%d\n", tmp1.index);
-#endif
-			}
-			else {
-				k2 = 0;
-				while(k2 < c && hashtable[key2][k2].index > 0)
-					k2++;
-				/* insert the index into the hash table */
-				hashtable[key2][k2] = tmp2;
-			}
 		}
-		else
-			haspair = 0;
+		
+		if(findpair(hashtable, tmp[0].index, s, c) >= 0) {
+			haspair = 1;
+			assert(findpair(hashtable, tmp[1].index, s, c) == -1);
+			inserthashtable(hashtable, tmp[1], s, c);
+			tmp[1] = hashtable[f(tmp[0].index)][findpair(hashtable, tmp[0].index, s, c)];
+			hashtable[f(tmp[0].index)][findpair(hashtable, tmp[0].index, s, c)].index = 0;
+			continue;
+		}
+
+		if(findpair(hashtable, tmp[1].index, s, c) >= 0) {
+			haspair = 1;
+			assert(findpair(hashtable, tmp[0].index, s, c) == -1);
+			inserthashtable(hashtable, tmp[0], s, c);
+			tmp[0] = hashtable[f(tmp[1].index)][findpair(hashtable, tmp[1].index, s, c)];
+			hashtable[f(tmp[1].index)][findpair(hashtable, tmp[1].index, s, c)].index = 0;
+			continue;
+		}
+		
+		assert(haspair == 0);
+				
 	}
 	printf("\n");
 }
