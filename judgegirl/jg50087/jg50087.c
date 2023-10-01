@@ -7,6 +7,12 @@ int max(int a, int b) {
 	return a > b ? a : b;
 }
 
+void swap(int *a, int *b) {
+	(*a) += (*b);
+	(*b) = (*a) - (*b);
+	(*a) -= (*b);
+}
+
 int FindBalancePoint(int arr[maxn], int n) {
 	for(int i = 1; i < n - 1; ++i) {
 		int total = 0;
@@ -29,18 +35,21 @@ int main() {
 
 	for(int i = 0; i < n; ++i)
 		scanf("%d", &arr[i]);
-
-	if(FindBalancePoint(arr, n) > 0) {
-		for(int i = 0; i < n; ++i) {
-			if(i > 0)
-				printf(" ");
-			if(i == FindBalancePoint(arr, n))
-				printf("v");
-			else
-				printf("%d", arr[i]);
-		}
-		printf("\n");
+	
+	int ans = FindBalancePoint(arr, n), k = 0;
+	while(ans < 0) {
+		swap(&arr[k], &arr[n - k - 1]);
+		k++;
+		ans = FindBalancePoint(arr, n);
 	}
-	else
-		printf("not found\n");
+
+	for(int i = 0; i < n; ++i) {
+		if(i > 0)
+			printf(" ");
+		if(i == ans)
+			printf("v");
+		else
+			printf("%d", arr[i]);
+	}
+	printf("\n");
 }
