@@ -6,4 +6,4 @@ Online judge system:
 
 [Dandanjudge](<https://dandanjudge.fdhs.tyc.edu.tw/>)
 
-[Judgegirl](<https://judgegirl.csie.org>)
+[Judgegirl(Note that you can only connect to the website with NTU VPN)](<https://judgegirl.csie.org>)
