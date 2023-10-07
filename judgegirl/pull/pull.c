@@ -7,31 +7,55 @@ int main() {
 	int T, C, D, distance;
 	scanf("%d%d%d%d", &T, &C, &D, &distance);
 	assert(T > C && C > D);
-	int locT = T, locC = C, locD = D, pulls = 0;
+	int locT = T, locC = C, locD = D;
+	long long pulls = 0;
+
+#ifdef DEBUG
+	printf("%3d:", pulls);
+	for(int i = 1; i <= distance; ++i) {
+		if(i > locD - D && i <= locD)
+			printf("D");
+		else if(i > locC - C && i <= locC)
+			printf("C");
+		else if(i > locT - T && i <= locT)
+			printf("T");
+		else
+			printf("-");
+	}
+	printf("\n");
+#endif
+
+	/* goal: every pull should be the maximum amount that moment can pull */
 
 	while(locD < distance) {
 		if(locD < locC) {
-#ifdef DEBUG
-			printf("pull %d, pulled D from %d to %d\n", pulls + 1, locD, locC);
-#endif
 			locD = locC;
 			pulls++;
 		}
-		else if(locC < locT) {
-#ifdef DEBUG
-			printf("pull %d, pulled C from %d to %d\n", pulls + 1, locC, min(locT, locD - D + C));
-#endif
+		else if(locC < locT && (locD - D + C <= locT || locT >= distance)) {
 			locC = min(locT, locD - D + C);
 			pulls++;
 		}
 		else {
-#ifdef DEBUG
-			printf("pull %d, pulled T from %d to %d\n", pulls + 1, locT, locC - C + T);
-#endif
-			locT = locC - C + T;
+			locT = min(distance, locC - C + T);
 			pulls++;
 		}
-	}
 
-	printf("%d\n", pulls);
+#ifdef DEBUG
+		printf("%3d:", pulls);
+		for(int i = 1; i <= distance; ++i) {
+			if(i > locD - D && i <= locD)
+				printf("D");
+			else if(i > locC - C && i <= locC)
+				printf("C");
+			else if(i > locT - T && i <= locT)
+				printf("T");
+			else
+				printf("-");
+		}
+		printf("\n");
+#endif
+
+	}
+	printf("%lld\n", pulls);
 }
