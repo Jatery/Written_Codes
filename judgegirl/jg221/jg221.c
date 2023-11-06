@@ -8,47 +8,40 @@ void write(char string[MAX], int len, int wordcount, int m) {
 	char output[MAX];
 	for(int i = 0; i < wordcount; ++i) {
 		sscanf(string + ptr, "%s", output);
-		strcpy(output + strlen(output), "\0");	
 		printf("%s", output);
 		ptr += strlen(output) + 1;
-		if(i < wordcount - 1 && wordcount > 1) {
+		if(wordcount == 1) {
+            for(int j = 0; j < m - len; ++j) {
+                printf(" ");
+            }
+        }
+		else if(i < wordcount - 1) {
 			for(int j = 0; j < (m - len) / (wordcount - 1); ++j)
 				printf(" ");
 			if(i < (m - len) % (wordcount - 1))
 				printf(" ");
 		}
-		else if(wordcount == 1) {
-			for(int j = 0; j < m - len; ++j) {
-				printf(" ");
-			}
-		}
 	}
-	printf("\n");
+	if(wordcount > 0)
+		printf("\n");
 }
 
 int main() {
 	int m, len = 0, wordcount = 0;
 	scanf("%d", &m);
 	char string[MAX], input[MAX];
-	while(scanf("%s", input) != EOF) {
-		if(len + wordcount + strlen(input) > m || strlen(input) >= m) {
-			if(wordcount > 0)
-				write(string, len, wordcount, m);
-			while(strlen(input) >= m) {
-				char output[MAX];
-				for(int i = 0; i < strlen(input) / m; ++i) {
-					strncpy(output, input + m * i, m);
-					strcpy(output + m, "\0");
-					printf("%s\n", output);
-				}
-				strncpy(output, input + m * (strlen(input) / m), m);
-				strncpy(input, output, m);
-			}
+	while(scanf("%s", input) != EOF) {	
+		if(strlen(input) == m) {
+			write(string, len, wordcount, m);
+			printf("%s\n", input);
+			wordcount = 0;
+			len = 0;
+			continue;
+		}
+		if(len + wordcount + strlen(input) > m) {
+			write(string, len, wordcount, m);
 			strncpy(string, input, m);
-			if(strlen(input) > 0)
-				wordcount = 1;
-			else
-				wordcount = 0;
+			wordcount = 1;
 			len = strlen(input);
 			continue;
 		}
