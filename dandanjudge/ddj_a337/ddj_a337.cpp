@@ -6,6 +6,15 @@ using namespace std;
 #define fr front()
 #define h(x, y) n-1-x + m-1-y
 
+// test of oneline command
+
+/* test of multiple lines command
+ * 1
+ * 2
+ * for(int i = 0; i < n; ++i)
+ * 4
+ */
+
 int main() {
 	cin.tie(0);
 	ios_base::sync_with_stdio(0);
