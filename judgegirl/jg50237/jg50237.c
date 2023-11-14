@@ -23,7 +23,13 @@ typedef struct{
 	int height[MAXN][MAXN];
 } Tower;
 
-void getTower(Tower *tower, int n) {
+typedef struct{
+	char index[MAXSTRINGLENGTH];
+	int x;
+	int y;
+} Hash;
+
+void getTower(Tower *tower, Hash hash[MAXN * MAXN][10], int n) {
 	for(int i = 0; i < n; ++i) {
 		for(int j = 0; j <= i; ++j) {
 			for(int k = 0; k <= i; ++k) {
@@ -42,15 +48,23 @@ void getTower(Tower *tower, int n) {
 #endif
 }
 
+void pushTable(Tower tower, Hash *hash, Hash *tmp, int n) {
+	for(int i = 0; i < n; ++i) {
+		for(int j = 0; j < n; ++j) {
+			
+		}
+	}
+}
+
 int main() {
 	int n;
 	Tower tower;
-	char hashTable[MAXN * MAXN][10][MAXSTRINGLENGTH];
+	Hash hash[MAXN * MAXN][10], tmp[2];
 	scanf("%d", &n);
 
 	assert(n <= MAXN);
 
-	getTower(&tower, n);
-	//pushTable();
+	getTower(&tower, hash, n);
+	pushTable(tower, *hash, tmp, n);
 
 }
