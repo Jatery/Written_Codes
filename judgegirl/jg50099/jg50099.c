@@ -23,6 +23,17 @@ int findBalancePoint(int64_t arr[MAXN], int l, int r) {
 	return -1;
 }
 
+void divide (int64_t arr[MAXN], int l, int r) {
+	if (r - l < 3)
+		return;
+	int point = findBalancePoint(arr, l, r);
+	if (point == -1)
+		return;
+	divide(arr, l, point);
+	printf("%d\n", point);
+	divide(arr, point + 1, r);
+}
+
 int main() {
 	int n;
 	scanf("%d", &n);
@@ -31,5 +42,5 @@ int main() {
 	for (int i = 0; i < n; ++i) {
 		scanf("%lld", &arr[i]);
 	}
-	printf("%d\n", findBalancePoint(arr, 0, n));
+	divide(arr, 0, n);
 }
