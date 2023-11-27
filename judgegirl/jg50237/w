@@ -3,7 +3,6 @@
 #include <math.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 #define MAXSTRINGLENGTH 5
 #define MAXN 10
@@ -36,8 +35,8 @@ void getTower(Tower *tower, Hash hash[MAXN * MAXN][10], int n) {
 		for(int j = 0; j <= i; ++j) {
 			for(int k = 0; k <= i; ++k) {
 				scanf("%s", tower->string[n - i][j][k]);
-				tower->height[j][k] = n - max(j, k);
-			}	
+			}
+			tower->height[i][j] = n - max(i, j);
 		}
 	}
 #ifdef DEBUG
@@ -51,12 +50,6 @@ void getTower(Tower *tower, Hash hash[MAXN * MAXN][10], int n) {
 			}
 			printf("\n");
 		}
-	for (int i = 0; i < n; ++i) {
-		for (int j = 0; j < n; ++j) {
-			printf("%d ", tower->height[i][j]);
-		}
-		printf("\n");
-	}
 #endif
 }
 
@@ -64,10 +57,7 @@ void pushTable(Tower tower, Hash hash[MAXN * MAXN][10], Hash tmp[], int n) {
 	bool flag = 0;
 	for(int i = 0; i < n; ++i) {
 		for(int j = 0; j < n; ++j) {
-			if (strcmp(tower.string[tower.height[i][j]][i][j], "") == 0) {
-				printf("%d %d %d\n", i, j, tower.height[i][j]);
-				exit(0);
-			}
+			//assert (strcmp(tower.string[tower.height[i][j]][i][j], "") != 0);
 			int key = hashIndex(tower.string[tower.height[i][j]][i][j], n);
 			for (int k = 0; k < 10; ++k) {
 				if (strcmp(hash[key][k].index, tower.string[tower.height[i][j]][i][j]) == 0) {
