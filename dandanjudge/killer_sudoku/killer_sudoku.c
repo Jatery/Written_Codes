@@ -78,7 +78,7 @@ int main() {
 		for(int i = 0; i < 9; ++i)
 			for(int j = 0; j < 9; ++j)
 				scanf("%d", &arr[i][j].value);
-		Group groups[40];
+		Group groups[85];
 		int k = 0;
 		for(int j = 0; j < m; ++j) {
 			scanf("%d%d", &groups[k].N, &groups[k].total);

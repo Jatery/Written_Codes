@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct {
 	int total;
@@ -51,9 +52,6 @@ void solve(Node arr[9][9], int *index, Group groups[]) {
 					flag = 0;
 			}
 		if(flag) {
-#ifdef DEBUG
-			printf("try arr[%d][%d] for %d\n", *index / 9, *index % 9, i);
-#endif
 			groups[arr[*index / 9][*index % 9].groupIndex].total -= i;
 			groups[arr[*index / 9][*index % 9].groupIndex].N--;
 			arr[*index / 9][*index % 9].value = i;
@@ -71,11 +69,13 @@ void solve(Node arr[9][9], int *index, Group groups[]) {
 
 int main() {
 	FILE *fpIn, *fpOut;
-	for (int w = 0; w < 2; w++) {
-		char inputPathName[] = "testcase/ .in";
+	int w;
+	scanf("%d", &w);
+	while (w--) {
+		char inputPathName[] = "testcase/b074_0 .in";
 		inputPathName[strstr(inputPathName, " ") - inputPathName] = w + '0';
 		fpIn = fopen(inputPathName, "r");
-		char outputPathName[] = "testanswer/ .out";
+		char outputPathName[] = "testcase/b074_0 .out";
 		outputPathName[strstr(outputPathName, " ") - outputPathName] = w + '0';
 		fpOut = fopen(outputPathName, "w+");
 		assert(fpIn != NULL);
@@ -85,15 +85,23 @@ int main() {
 			fscanf(fpIn, "%d", &m);
 			Node arr[9][9];
 			for(int i = 0; i < 9; ++i)
-				for(int j = 0; j < 9; ++j)
+				for(int j = 0; j < 9; ++j) {
 					fscanf(fpIn, "%d", &arr[i][j].value);
-			Group groups[40];
+					arr[i][j].groupIndex = -1;
+				}
+			Group groups[85];
 			int k = 0;
 			for(int j = 0; j < m; ++j) {
 				fscanf(fpIn, "%d%d", &groups[k].N, &groups[k].total);
 				int N = groups[k].N;
 				for(int i = 0; i < N; ++i) {
 					fscanf(fpIn, "%d%d", &groups[k].addr[i][0], &groups[k].addr[i][1]);
+					assert(groups[k].addr[i][0] >= 0 && groups[k].addr[i][0] < 9);
+					assert(groups[k].addr[i][1] >= 0 && groups[k].addr[i][1] < 9);
+					if(arr[groups[k].addr[i][0]][groups[k].addr[i][1]].groupIndex != -1) {
+						printf("Error: %d %d %d\n", k, groups[k].addr[i][0], groups[k].addr[i][1]);
+						exit(0);
+					}
 					arr[groups[k].addr[i][0]][groups[k].addr[i][1]].groupIndex = k;
 					if(arr[groups[k].addr[i][0]][groups[k].addr[i][1]].value > 0)
 						groups[k].N--;
@@ -120,20 +128,15 @@ int main() {
 				}
 				fprintf(fpOut, "\n");
 			}
-#ifdef DEBUG
-			for (int i = 0; i < 9; ++i) {
-				for(int j = 0; j < 9; ++j) {
-					printf("%3d", groups[arr[i][j].groupIndex].total);
-				}
-				printf("\n");
-			}
-			for(int i = 0; i < m; ++i) {
-				if (groups[i].total != 0) {
-					printf("%d %d\n", i, groups[i].total);
-				}
-			}
-#endif
 			fprintf(fpOut, "\n");
+			for(int i = 0; i < 9; ++i) {
+				for(int j = 0; j < 9; ++j) {
+					if(arr[i][j].groupIndex == -1) {
+						printf("Error: %d %d %d\n", arr[i][j].groupIndex, i, j);
+						exit(0);
+					}
+				}
+			}
 		}	
 		fclose(fpIn);
 		fclose(fpOut);
