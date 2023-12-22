@@ -76,22 +76,32 @@ int main() {
 		scanf("%d", &m);
 		Node arr[9][9];
 		for(int i = 0; i < 9; ++i)
-			for(int j = 0; j < 9; ++j)
+			for(int j = 0; j < 9; ++j) {
 				scanf("%d", &arr[i][j].value);
-		Group groups[85];
-		int k = 0;
-		for(int j = 0; j < m; ++j) {
-			scanf("%d%d", &groups[k].N, &groups[k].total);
-			int N = groups[k].N;
-			for(int i = 0; i < N; ++i) {
-				scanf("%d%d", &groups[k].addr[i][0], &groups[k].addr[i][1]);
-				arr[groups[k].addr[i][0]][groups[k].addr[i][1]].groupIndex = k;
-				if(arr[groups[k].addr[i][0]][groups[k].addr[i][1]].value > 0)
-					groups[k].N--;
-				groups[k].total -= arr[groups[k].addr[i][0]][groups[k].addr[i][1]].value;
 			}
-			k++;
+		Group groups[85];
+		for(int i = 0; i < m; ++i) {
+			groups[i].N = 0;
 		}
+		for(int i = 0; i < 9; ++i) {
+			for(int j = 0; j < 9; ++j) {
+				scanf("%d", &arr[i][j].groupIndex);
+				groups[arr[i][j].groupIndex].addr[groups[arr[i][j].groupIndex].N][0] = i;
+				groups[arr[i][j].groupIndex].addr[groups[arr[i][j].groupIndex].N][1] = j;
+				groups[arr[i][j].groupIndex].N++;
+			}
+		}
+		for(int i = 0; i < m; ++i) {
+			scanf("%d", &groups[i].total);
+			int N = groups[i].N;
+			for(int j = 0; j < N; ++j) {
+				assert(arr[groups[i].addr[j][0]][groups[i].addr[j][1]].groupIndex == i);
+				if(arr[groups[i].addr[j][0]][groups[i].addr[j][1]].value > 0)
+					groups[i].N--;
+				groups[i].total -= arr[groups[i].addr[j][0]][groups[i].addr[j][1]].value;
+			}
+		}
+
 #ifdef DEBUG
 		for(int i = 0; i < 9; ++i) {
 			for(int j = 0; j < 9; ++j) {

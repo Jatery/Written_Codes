@@ -87,28 +87,40 @@ int main() {
 			for(int i = 0; i < 9; ++i)
 				for(int j = 0; j < 9; ++j) {
 					fscanf(fpIn, "%d", &arr[i][j].value);
-					arr[i][j].groupIndex = -1;
 				}
 			Group groups[85];
-			int k = 0;
-			for(int j = 0; j < m; ++j) {
-				fscanf(fpIn, "%d%d", &groups[k].N, &groups[k].total);
-				int N = groups[k].N;
-				for(int i = 0; i < N; ++i) {
-					fscanf(fpIn, "%d%d", &groups[k].addr[i][0], &groups[k].addr[i][1]);
-					assert(groups[k].addr[i][0] >= 0 && groups[k].addr[i][0] < 9);
-					assert(groups[k].addr[i][1] >= 0 && groups[k].addr[i][1] < 9);
-					if(arr[groups[k].addr[i][0]][groups[k].addr[i][1]].groupIndex != -1) {
-						printf("Error: %d %d %d\n", k, groups[k].addr[i][0], groups[k].addr[i][1]);
-						exit(0);
-					}
-					arr[groups[k].addr[i][0]][groups[k].addr[i][1]].groupIndex = k;
-					if(arr[groups[k].addr[i][0]][groups[k].addr[i][1]].value > 0)
-						groups[k].N--;
-					groups[k].total -= arr[groups[k].addr[i][0]][groups[k].addr[i][1]].value;
+			for(int i = 0; i < m; ++i) {
+				groups[i].N = 0;
+			}
+			for(int i = 0; i < 9; ++i) {
+				for(int j = 0; j < 9; ++j) {
+					fscanf(fpIn, "%d", &arr[i][j].groupIndex);
+					groups[arr[i][j].groupIndex].addr[groups[arr[i][j].groupIndex].N][0] = i;
+					groups[arr[i][j].groupIndex].addr[groups[arr[i][j].groupIndex].N][1] = j;
+					groups[arr[i][j].groupIndex].N++;
 				}
-				k++;
-			}	
+			}
+
+#ifdef DEBUG
+			for(int i = 0; i < 9; ++i) {
+				for(int j = 0; j < 9; ++j) {
+					printf("%3d", arr[i][j].groupIndex);
+				}
+				printf("\n");
+			}
+#endif
+
+			for(int i = 0; i < m; ++i) {
+				fscanf(fpIn, "%d", &groups[i].total);
+				int N = groups[i].N;
+				for(int j = 0; j < N; ++j) {
+					assert(arr[groups[i].addr[j][0]][groups[i].addr[j][1]].groupIndex == i);
+					if(arr[groups[i].addr[j][0]][groups[i].addr[j][1]].value > 0)
+						groups[i].N--;
+					groups[i].total -= arr[groups[i].addr[j][0]][groups[i].addr[j][1]].value;
+				}
+			}
+				
 #ifdef DEBUG
 			for(int i = 0; i < 9; ++i) {
 				for(int j = 0; j < 9; ++j) {
@@ -129,14 +141,16 @@ int main() {
 				fprintf(fpOut, "\n");
 			}
 			fprintf(fpOut, "\n");
+#ifdef DEBUG
 			for(int i = 0; i < 9; ++i) {
 				for(int j = 0; j < 9; ++j) {
 					if(arr[i][j].groupIndex == -1) {
-						printf("Error: %d %d %d\n", arr[i][j].groupIndex, i, j);
+						printf("Error: %d %d\n", i, j);
 						exit(0);
 					}
 				}
 			}
+#endif
 		}	
 		fclose(fpIn);
 		fclose(fpOut);
