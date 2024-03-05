@@ -201,16 +201,9 @@ if [[ $optR -eq 1 ]]; then
 					filename=$(echo $line | cut -d' ' -f1)
 					filename=${filename%":"}
 					filename=$(echo $filename | rev | cut -d'/' -f1 | rev)
-				fi
-				if [[ "$regex" == -* ]]; then
-					regex=${regex#"-"}
-					if [[ "$filename" =~ "\-$regex" ]]; then
-						echo $line
-					fi
-				else
-					if [[ "$filename" =~ "$regex" ]]; then
-						echo $line
-					fi
+				fi	
+				if [[ "$filename" =~ "$regex" ]]; then
+					echo $line
 				fi
 			done
 		else
